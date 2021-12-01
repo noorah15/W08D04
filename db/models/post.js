@@ -5,10 +5,7 @@ const posts = new mongoose.Schema({
   img: { type: String, required: true, trim: true },
   desc: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
-  likes: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "users2" },
-    { type: Boolean, default: false },
-  ],
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "users2" }],
   isDel: { type: Boolean, default: false },
 });
 

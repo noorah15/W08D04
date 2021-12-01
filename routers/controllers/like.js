@@ -1,25 +1,18 @@
 const postModel = require("./../../db/models/post");
 
-const addLike = (req, res) => {
+const addLike = async (req, res) => {
   const { userId, postId } = req.body;
 
-  postModel
-    .find({ _id: postId })
-    .then((result) => {
-      // PersonModel.update(
-      //   { _id: person._id },
-      //   { $push: { friends: friend } },
-      //   done
-      // );
+  try {
+    const newLike = await postModel.findOne({ _id: postId });
+    console.log(newLike);
+    newLike.likes.push(userId);
+    newLike.save();
 
-      result.likes.push(userId);
-      result.save(done);
-
-      res.json(result);
-    })
-    .catch((err) => {
-      res.send(err);
-    });
+    res.status(200).json(newLike);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 };
 
 const removeLike = (req, res) => {

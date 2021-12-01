@@ -13,72 +13,76 @@ const addPost = (req, res) => {
   newPost
     .save()
     .then((result) => {
-      res.json(result);
+      res.status(200).json(result);
     })
     .catch((err) => {
-      res.send(err);
+      res.status(400).send(err);
     });
 };
 
-const updatePost = (req, res) => {
-  const { postId, img, desc } = req.body;
-  let doc = "";
-  if (img !== undefined) {
-    doc = await userModel.updateOne(
-      { _id: postId },
-      { img: img, timestamp: Date.now }
-    );
-  }
-  if (desc !== undefined) {
-    doc = await userModel.updateOne(
-      { _id: postId },
-      { desc: desc, timestamp: Date.now }
-    );
-  }
+const updatePost = async (req, res) => {
+  try {
+    const { postId, img, desc } = req.body;
+    let doc = "";
+    if (img !== undefined) {
+      doc = await postModel.updateOne({ _id: postId }, { img: img });
+      console.log(doc);
+    }
+    if (desc !== undefined) {
+      doc = await postModel.updateOne({ _id: postId }, { desc: desc });
+      console.log(doc);
+    }
 
-  res.status(200).json(doc);
+    res.status(200).json(doc);
+  } catch (err) {
+    res.status(200).json(err);
+  }
 };
 
-const delPost = (req, res) => {
+const delPost = async (req, res) => {
   const { postId } = req.body;
 
-  let doc = await userModel.updateOne({ _id: postId }, { isDel: true });
-  if (doc) res.status(200).json(doc);
-  else res.status(400).json("Post not found");
+  try {
+    let doc = await postModel.updateOne({ _id: postId }, { isDel: true });
+    ires.status(200).json(doc);
+  } catch (err) {
+    res.status(400).json("Post not found");
+  }
 };
 
 const getAllPosts = (req, res) => {
   postModel
-    .find({})
+    .find({ isDel: false })
     .then((result) => {
-      res.json(result);
+      res.status(200).json(result);
     })
     .catch((err) => {
-      res.send(err);
+      res.status(400).send(err);
     });
 };
 
 const getAllPostsForUser = (req, res) => {
-  const { id } = body.params;
+  const { id } = req.params;
   postModel
-    .find({ user: id })
+    .find({ user: id, isDel: false })
     .then((result) => {
-      res.json(result);
+      res.status(200).json(result);
     })
     .catch((err) => {
-      res.send(err);
+      res.status(400).send(err);
     });
 };
 
 const getPostForUser = (req, res) => {
-  const { id } = body.params;
+  const { id } = req.params;
   postModel
-    .find({ _id: id })
+    .find({ _id: id, isDel: false })
     .then((result) => {
-      res.json(result);
+      if (result.length > 0) res.status(200).json(result);
+      else res.status(400).json("not found");
     })
     .catch((err) => {
-      res.send(err);
+      res.status(400).send(err);
     });
 };
 

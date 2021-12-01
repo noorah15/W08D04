@@ -20,36 +20,45 @@ const addCommnet = (req, res) => {
     });
 };
 
-const updateComment = (req, res) => {
+const updateComment = async (req, res) => {
   const { commnetId, desc } = req.body;
-  let doc = await userModel.updateOne({ _id: commnetId }, { desc: desc });
-  if (doc) res.status(200).json(doc);
-  else res.status(400).json("Comment not found");
+  try {
+    let doc = await commentModel.updateOne({ _id: commnetId }, { desc: desc });
+    if (doc) res.status(200).json(doc);
+    else res.status(400).json("Comment not found");
+  } catch (err) {
+    res.status(400).json("Comment not found");
+  }
 };
 
-const delComment = (req, res) => {
+const delComment = async (req, res) => {
   const { commnetId } = req.body;
 
-  let doc = await userModel.updateOne({ _id: commnetId }, { isDel: true });
-  if (doc) res.status(200).json(doc);
-  else res.status(400).json("Comment not found");
+  try {
+    let doc = await commentModel.updateOne({ _id: commnetId }, { isDel: true });
+    if (doc) res.status(200).json(doc);
+    else res.status(400).json("Comment not found");
+  } catch (err) {
+    res.status(400).json("Comment not found");
+  }
 };
 
 const getComment = (req, res) => {
   const { id } = req.params;
   commentModel
-    .find({ _id: id })
+    .findOne({ _id: id, isDel: false })
     .then((result1) => {
       postModel
-        .find({ _id: result1.postId })
+        .findOne({ _id: result1.postId, isDel: false })
         .then((result2) => {
           let arr = [];
           arr.push(result1);
-          arr.push(result2);
-          res.json(arr);
+          if (result2 === null) arr.push("can't find post");
+          else arr.push(result2);
+          res.status(400).json(arr);
         })
         .catch((err) => {
-          res.send(err);
+          res.status(400).send(err);
         });
 
       //res.json(result);

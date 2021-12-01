@@ -3,24 +3,20 @@ const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
 
 const {
-  addPost,
-  updatePost,
-  delPost,
-  getAllPosts,
-  getAllPostsForUser,
-  getPostForUser,
-} = require("./../controllers/post.js");
+  addCommnet,
+  updateComment,
+  delComment,
+  getComment,
+} = require("./../controllers/comments.js");
 const postRoter = express.Router();
 
 //general
-postRoter.get("/getAllPosts", getAllPosts);
-postRoter.get("/getAllPostsForUser/:id", getAllPostsForUser);
-postRoter.get("/getPostForUser/:id", getPostForUser);
+postRoter.get("/getComment/:id", getComment);
 
 //user
-postRoter.post("/addPost", addPost);
-postRoter.put("/updatePost", updatePost);
-postRoter.delete("/delPost", delPost);
+postRoter.post("/addCommnet", addCommnet);
+postRoter.put("/updateComment", updateComment);
+postRoter.delete("/delComment", delComment);
 
 //for admin
 // userRouter.get("/users", authentication, authorization, getUsers);
