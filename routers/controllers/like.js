@@ -5,7 +5,7 @@ const addLike = async (req, res) => {
 
   try {
     const newLike = await postModel.findOne({ _id: postId });
-    console.log(newLike);
+    //console.log(newLike);
     newLike.likes.push(userId);
     newLike.save();
 
