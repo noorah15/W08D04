@@ -1,4 +1,5 @@
 const commentModel = require("./../../db/models/commnet");
+const postModel = require("./../../db/models/post");
 
 const addCommnet = (req, res) => {
   const { userId, postId, desc } = req.body;
@@ -35,11 +36,23 @@ const delComment = (req, res) => {
 };
 
 const getComment = (req, res) => {
-  const { id } = body.params;
-  postModel
-    .find({ user: id })
-    .then((result) => {
-      res.json(result);
+  const { id } = req.params;
+  commentModel
+    .find({ _id: id })
+    .then((result1) => {
+      postModel
+        .find({ _id: result1.postId })
+        .then((result2) => {
+          let arr = [];
+          arr.push(result1);
+          arr.push(result2);
+          res.json(arr);
+        })
+        .catch((err) => {
+          res.send(err);
+        });
+
+      //res.json(result);
     })
     .catch((err) => {
       res.send(err);
