@@ -1,6 +1,9 @@
 const express = require("express");
 const authentication = require("../middlewares/authentication");
-const authorization = require("../middlewares/authorization");
+const {
+  adminAuthorization,
+  userAuthorization,
+} = require("../middlewares/authorization");
 
 const {
   addPost,
@@ -18,11 +21,15 @@ postRoter.get("/getAllPostsForUser/:id", getAllPostsForUser);
 postRoter.get("/getPostForUser/:id", getPostForUser);
 
 //user
-postRoter.post("/addPost", addPost);
-postRoter.put("/updatePost", updatePost);
-postRoter.delete("/delPost", delPost);
+postRoter.post("/addPost", authentication, userAuthorization, addPost);
+postRoter.put("/updatePost", authentication, userAuthorization, updatePost);
+postRoter.delete("/delPost", authentication, userAuthorization, delPost);
 
 //for admin
-// userRouter.get("/users", authentication, authorization, getUsers);
-// userRouter.delete("/delUsers", authentication, authorization, delUser);
+postRoter.delete(
+  "/delPostByAdmin",
+  authentication,
+  adminAuthorization,
+  delPost
+);
 module.exports = postRoter;

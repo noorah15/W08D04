@@ -1,5 +1,6 @@
-const userModel = require("./../../db/models/user");
+const likeModel = require("./../../db/models/like");
 const postModel = require("./../../db/models/post");
+const commentModel = require("./../../db/models/commnet");
 
 const addPost = (req, res) => {
   const { user, img, desc } = req.body;
@@ -78,8 +79,32 @@ const getPostForUser = (req, res) => {
   postModel
     .find({ _id: id, isDel: false })
     .then((result) => {
-      if (result.length > 0) res.status(200).json(result);
-      else res.status(400).json("not found");
+      if (result.length > 0) {
+        let like = "1234";
+        let comment = "";
+
+        likeModel
+          .find({ postId: id, isDel: false })
+          .then((result) => {
+            like = result;
+            console.log(like);
+          })
+          .catch((err) => {
+            res.status(400).send(err);
+          });
+        console.log(like);
+
+        commentModel
+          .find({ postId: id, isDel: false })
+          .then((result) => {
+            comment = result;
+          })
+          .catch((err) => {
+            res.status(400).send(err);
+          });
+
+        res.status(200).json({ result, like, comment });
+      } else res.status(400).json("not found");
     })
     .catch((err) => {
       res.status(400).send(err);

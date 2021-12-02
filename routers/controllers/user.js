@@ -71,6 +71,7 @@ const login = (req, res) => {
           if (hashedPass) {
             const payload = {
               role: result[0].role,
+              userId: result[0]._id,
             };
             const options = {
               expiresIn: "60m",

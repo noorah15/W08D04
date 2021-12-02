@@ -1,6 +1,9 @@
 const express = require("express");
 const authentication = require("../middlewares/authentication");
-const authorization = require("../middlewares/authorization");
+const {
+  adminAuthorization,
+  userAuthorization,
+} = require("../middlewares/authorization");
 
 const {
   addCommnet,
@@ -19,6 +22,5 @@ postRoter.put("/updateComment", updateComment);
 postRoter.delete("/delComment", delComment);
 
 //for admin
-// userRouter.get("/users", authentication, authorization, getUsers);
-// userRouter.delete("/delUsers", authentication, authorization, delUser);
+postRoter.delete("/delComment", authentication, adminAuthorization, delComment);
 module.exports = postRoter;
