@@ -78,30 +78,31 @@ const getPostForUser = (req, res) => {
   const { id } = req.params;
   postModel
     .find({ _id: id, isDel: false })
-    .then((result) => {
+    .then(async (result) => {
       if (result.length > 0) {
-        let like = "1234";
-        let comment = "";
+        let like = await likeModel.find({ postId: id, isDel: false });
+        let comment = await commentModel.find({ postId: id, isDel: false });
 
-        likeModel
-          .find({ postId: id, isDel: false })
-          .then((result) => {
-            like = result;
-            console.log(like);
-          })
-          .catch((err) => {
-            res.status(400).send(err);
-          });
-        console.log(like);
+        // likeModel
+        //   .find({ postId: id, isDel: false })
+        //   .then((result) => {
+        //     like = result;
+        //     console.log(like);
+        //   })
+        //   .catch((err) => {
+        //     res.status(400).send(err);
+        //   });
+        // console.log(like);
 
-        commentModel
-          .find({ postId: id, isDel: false })
-          .then((result) => {
-            comment = result;
-          })
-          .catch((err) => {
-            res.status(400).send(err);
-          });
+        // commentModel
+        //   .find({ postId: id, isDel: false })
+        //   .then((result) => {
+        //     comment = result;
+
+        //   })
+        //   .catch((err) => {
+        //     res.status(400).send(err);
+        //   });
 
         res.status(200).json({ result, like, comment });
       } else res.status(400).json("not found");
