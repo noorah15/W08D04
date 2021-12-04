@@ -17,10 +17,20 @@ const postRoter = express.Router();
 postRoter.get("/getComment/:id", getComment);
 
 //user
-postRoter.post("/addCommnet", addCommnet);
-postRoter.put("/updateComment", updateComment);
-postRoter.delete("/delComment", delComment);
+postRoter.post("/addCommnet", authentication, userAuthorization, addCommnet);
+postRoter.put(
+  "/updateComment",
+  authentication,
+  userAuthorization,
+  updateComment
+);
+postRoter.delete("/delComment", authentication, userAuthorization, delComment);
 
 //for admin
-postRoter.delete("/delComment", authentication, adminAuthorization, delComment);
+postRoter.delete(
+  "/delCommentByAdmin",
+  authentication,
+  adminAuthorization,
+  delComment
+);
 module.exports = postRoter;
