@@ -1,4 +1,15 @@
-## social media backend
+# Social media backend
+
+## Description:
+
+In this task, it has been created social media backend that allow to users interact with it by register and insert his/her information. Also, it allows to create new posts and intract with each other by create new comments on other users posts with likes.
+In addition, it has admin that has permissions to get all users information and delete any post and comment from any users.
+
+## UML:
+
+## Entity Relationship Diagram:
+
+## How did it work:
 
 In this task, it has been created backend with Express server.
 
