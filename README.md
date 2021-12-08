@@ -7,7 +7,11 @@ In addition, it has admin that has permissions to get all users information and 
 
 ## UML:
 
+![UML_D04.drawio img](https://github.com/noorah15/W08D04/blob/main/UML_D04.drawio.png)
+
 ## Entity Relationship Diagram:
+
+![UML_D04.drawio img](https://github.com/noorah15/W08D04/blob/main/DED_W08D04.drawio.png)
 
 ## How did it work:
 
