@@ -15,48 +15,60 @@ const register = (req, res) => {
   if (!re.test(String(savedEmail).toLowerCase().trim()))
     res.status(401).send("email address is not correct");
 
-  userModel
-    .find({})
-    .then(async (result) => {
-      const found = result.find((item) => {
-        return item.username == username.trim();
-      });
-      if (found) res.status(400).send("the username is exist");
-
-      const found2 = result.find((item) => {
-        return item.email == savedEmail;
-      });
-      if (found2) res.status(400).send("the email is exist");
-
-      if (found) res.status(400).send("the username or email are exist");
-      else {
-        const passwordHashed = await bcrypt.hash(password, SALT);
-
-        const newUser = new userModel({
-          email: savedEmail,
-          username: username,
-          password: passwordHashed,
-          avter: avter,
-          role,
+  if (
+    password.length > 5 &&
+    /\d/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)
+  )
+    userModel
+      .find({})
+      .then(async (result) => {
+        const found = result.find((item) => {
+          return item.username == username.trim();
         });
+        if (found) res.status(400).send("the username is exist");
 
-        newUser
-          .save()
-          .then((result) => {
-            res.status(201).json(result);
-          })
-          .catch((err) => {
-            res.status(400).json(err);
+        const found2 = result.find((item) => {
+          return item.email == savedEmail;
+        });
+        if (found2) res.status(400).send("the email is exist");
+
+        if (found) res.status(400).send("the username or email are exist");
+        else {
+          const passwordHashed = await bcrypt.hash(password, SALT);
+
+          const newUser = new userModel({
+            email: savedEmail,
+            username: username,
+            password: passwordHashed,
+            avter: avter,
+            role,
           });
-      }
-    })
-    .catch((err) => {
-      res.send(err);
-    });
+
+          newUser
+            .save()
+            .then((result) => {
+              res.status(201).json(result);
+            })
+            .catch((err) => {
+              res.status(400).json(err);
+            });
+        }
+      })
+      .catch((err) => {
+        res.send(err);
+      });
+  else {
+    console.log(password);
+    res.status(400).send("the password is not complex");
+  }
 };
 
 const login = (req, res) => {
   const { usernameOrEmail, password } = req.body;
+  //console.log(usernameOrEmail + " " + password);
 
   userModel
     .find({ $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }] })

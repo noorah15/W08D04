@@ -1,9 +1,11 @@
 const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
 const db = require("./db/db.js");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const role = require("./routers/routes/role");
 app.use(role);
