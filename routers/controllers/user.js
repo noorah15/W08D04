@@ -86,6 +86,37 @@ const verify = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const user = await userModel.findOne({ email: req.body.email });
+    if (!user)
+      return res.status(400).send("user with given email doesn't exist");
+
+    const link = `${process.env.BASE_URL}/user/completeResetPassword/${user._id}`;
+    await sendEmail(user.email, "Password reset", link);
+
+    res.send("password reset link sent to your email account");
+  } catch (error) {
+    res.send("An error occured");
+    console.log(error);
+  }
+};
+const completeResetPassword = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.params.id);
+    if (!user) return res.status(400).send("invalid link or expired");
+
+    user.password = req.body.password;
+    await user.save();
+    //await token.delete();
+
+    res.send("password reset sucessfully.");
+  } catch (error) {
+    res.send("An error occured");
+    console.log(error);
+  }
+};
+
 const login = (req, res) => {
   const { usernameOrEmail, password } = req.body;
   //console.log(usernameOrEmail + " " + password);
@@ -147,4 +178,12 @@ const delUser = async (req, res) => {
   res.status(200).json(doc);
 };
 
-module.exports = { register, verify, login, getUsers, delUser };
+module.exports = {
+  register,
+  verify,
+  login,
+  getUsers,
+  delUser,
+  resetPassword,
+  completeResetPassword,
+};
