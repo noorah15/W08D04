@@ -13,8 +13,8 @@ const adminAuthorization = async (req, res, next) => {
 const userAuthorization = async (req, res, next) => {
   const { userId } = req.body;
 
-  console.log(userId);
-  console.log(req.token.userId);
+  // console.log(userId);
+  // console.log(req.token.userId);
   if (req.token.userId === userId) {
     next();
   } else {

@@ -4,6 +4,7 @@ const commentModel = require("./../../db/models/commnet");
 
 const addPost = (req, res) => {
   const { user, img, desc } = req.body;
+  console.log(user + " " + img + " " + desc);
 
   const newPost = new postModel({
     user,
@@ -45,7 +46,7 @@ const delPost = async (req, res) => {
 
   try {
     let doc = await postModel.updateOne({ _id: postId }, { isDel: true });
-    ires.status(200).json(doc);
+    res.status(200).json(doc);
   } catch (err) {
     res.status(400).json("Post not found");
   }

@@ -7,11 +7,13 @@ const {
   login,
   getUsers,
   delUser,
+  verify,
 } = require("./../controllers/user.js");
 const userRouter = express.Router();
 
 userRouter.post("/signup", register);
 userRouter.post("/login", login);
+userRouter.get("/verify/:id", verify);
 
 //for admin
 userRouter.get("/users", authentication, adminAuthorization, getUsers);

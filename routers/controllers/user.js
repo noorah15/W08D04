@@ -1,6 +1,8 @@
 const userModel = require("./../../db/models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const sendEmail = require("./../../utils/email");
+//const userModel = users;
 
 const SALT = Number(process.env.SALT);
 const secretKey = process.env.secretKey;
@@ -49,7 +51,11 @@ const register = (req, res) => {
 
           newUser
             .save()
-            .then((result) => {
+            .then(async (result) => {
+              //console.log(result._id);
+              const message = `http://localhost:4000/user/verify/${result._id}`;
+              console.log(message);
+              await sendEmail(result.email, "Verify Email", message);
               res.status(201).json(result);
             })
             .catch((err) => {
@@ -63,6 +69,20 @@ const register = (req, res) => {
   else {
     console.log(password);
     res.status(400).send("the password is not complex");
+  }
+};
+
+const verify = async (req, res) => {
+  try {
+    const user = await userModel.findOne({ _id: req.params.id });
+
+    if (!user) return res.status(400).send("Invalid link");
+
+    await userModel.updateOne({ _id: user._id }, { verified: true });
+
+    res.send("email verified sucessfully");
+  } catch (error) {
+    res.status(400).send("An error occured");
   }
 };
 
@@ -127,4 +147,4 @@ const delUser = async (req, res) => {
   res.status(200).json(doc);
 };
 
-module.exports = { register, login, getUsers, delUser };
+module.exports = { register, verify, login, getUsers, delUser };
