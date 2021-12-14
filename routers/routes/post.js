@@ -12,6 +12,7 @@ const {
   getAllPosts,
   getAllPostsForUser,
   getPostForUser,
+  setLike,
 } = require("./../controllers/post.js");
 const postRoter = express.Router();
 
@@ -24,6 +25,7 @@ postRoter.get("/getPostForUser/:id", getPostForUser);
 postRoter.post("/addPost", authentication, userAuthorization, addPost);
 postRoter.put("/updatePost", authentication, userAuthorization, updatePost);
 postRoter.delete("/delPost", authentication, userAuthorization, delPost);
+postRoter.post("/setLike", authentication, userAuthorization, setLike);
 
 //for admin
 postRoter.delete(

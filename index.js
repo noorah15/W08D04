@@ -4,7 +4,7 @@ require("dotenv").config();
 const db = require("./db/db.js");
 
 const app = express();
-app.use(express.json());
+app.use(express.json()); //{ limit: "50mb" }
 app.use(cors());
 
 const role = require("./routers/routes/role");

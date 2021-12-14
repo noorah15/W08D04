@@ -1,15 +1,18 @@
 const likeModel = require("./../../db/models/like");
 const postModel = require("./../../db/models/post");
 const commentModel = require("./../../db/models/commnet");
+const userModel = require("./../../db/models/user");
 
 const addPost = (req, res) => {
-  const { user, img, desc } = req.body;
+  const { user, img, desc, username, avter } = req.body;
   console.log(user + " " + img + " " + desc);
 
   const newPost = new postModel({
     user,
     img,
     desc,
+    username,
+    avter,
   });
 
   newPost
@@ -37,7 +40,7 @@ const updatePost = async (req, res) => {
 
     res.status(200).json(doc);
   } catch (err) {
-    res.status(200).json(err);
+    res.status(400).json(err);
   }
 };
 
@@ -83,6 +86,7 @@ const getPostForUser = (req, res) => {
       if (result.length > 0) {
         let like = await likeModel.find({ postId: id, isDel: false });
         let comment = await commentModel.find({ postId: id, isDel: false });
+        let user = await userModel.find({}).select("username avter _id");
 
         // likeModel
         //   .find({ postId: id, isDel: false })
@@ -105,12 +109,50 @@ const getPostForUser = (req, res) => {
         //     res.status(400).send(err);
         //   });
 
-        res.status(200).json({ result, like, comment });
+        res.status(200).json({ result, like, comment, user });
       } else res.status(400).json("not found");
     })
     .catch((err) => {
       res.status(400).send(err);
     });
+};
+
+const setLike = async (req, res) => {
+  try {
+    const { postId, userId } = req.body;
+    const post = await postModel.findById(postId);
+
+    if (post) {
+      const found = post.likes.find((item) => {
+        return item.user === userId;
+      });
+
+      if (found) {
+        console.log(post);
+        post.likes.forEach((element) => {
+          if (element.user === userId) {
+            console.log(element.isLike);
+            element.isLike === true
+              ? (element.isLike = false)
+              : (element.isLike = true);
+            console.log(element.isLike);
+          }
+        });
+
+        post.markModified("likes");
+        await post.save();
+        res.status(200).json(post);
+      } else {
+        post.likes.push({ user: userId, isLike: true });
+        await post.save();
+        res.status(200).json(post);
+      }
+    } else {
+      res.status(400).json("not found");
+    }
+  } catch (err) {
+    res.status(400).json(err);
+  }
 };
 
 module.exports = {
@@ -120,4 +162,5 @@ module.exports = {
   getAllPosts,
   getAllPostsForUser,
   getPostForUser,
+  setLike,
 };

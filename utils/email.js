@@ -15,7 +15,7 @@ const sendEmail = async (email, subject, text) => {
         pass: pass,
       },
     });
-    console.log(transport);
+    //console.log(transport);
 
     await transport.sendMail({
       from: process.env.USER,
@@ -23,7 +23,7 @@ const sendEmail = async (email, subject, text) => {
       subject: subject,
       text: text,
     });
-    //console.log("email sent sucessfully");
+    console.log("email sent sucessfully");
   } catch (error) {
     console.log("email not sent");
     console.log(error);

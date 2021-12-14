@@ -2,12 +2,14 @@ const commentModel = require("./../../db/models/commnet");
 const postModel = require("./../../db/models/post");
 
 const addCommnet = (req, res) => {
-  const { userId, postId, desc } = req.body;
+  const { userId, postId, desc, username, avter } = req.body;
 
   const newComment = new commentModel({
     userId,
     postId,
     desc,
+    username,
+    avter,
   });
 
   newComment

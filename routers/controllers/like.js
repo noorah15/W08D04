@@ -5,12 +5,17 @@ const addLike = async (req, res) => {
 
   likeModel
     .findOne({ userId: userId, postId: postId })
-    .then((result) => {
+    .then(async (result) => {
       // const found = await likeModel.findOne({ userId: userId, postId: postId });
 
       console.log(result);
-      if (result) res.status(400).send("Like is exist");
-      else {
+      if (result) {
+        let doc = await likeModel.updateOne(
+          { _id: result._id },
+          { isDel: false }
+        );
+        res.status(200).json(doc);
+      } else {
         const newLike = new likeModel({
           userId,
           postId,
@@ -35,11 +40,14 @@ const removeLike = async (req, res) => {
   const { likeId } = req.body;
 
   try {
-    let doc = await likeModel.updateOne({ _id: likeId }, { isDel: true });
+    let doc = await likeModel.updateOne(
+      { _id: likeId, isDel: false },
+      { isDel: true }
+    );
     if (doc) res.status(200).json(doc);
-    else res.status(400).json("Comment not found");
+    else res.status(400).json("like not found");
   } catch (err) {
-    res.status(400).json("Comment not found");
+    res.status(400).json("like not found");
   }
 };
 

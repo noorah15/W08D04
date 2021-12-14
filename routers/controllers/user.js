@@ -7,7 +7,21 @@ const sendEmail = require("./../../utils/email");
 const SALT = Number(process.env.SALT);
 const secretKey = process.env.secretKey;
 
-const register = (req, res) => {
+const setPassword = async (password) => {
+  if (
+    password.length > 5 &&
+    /\d/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)
+  ) {
+    const passwordHashed = await bcrypt.hash(password, SALT);
+    return passwordHashed;
+  }
+  return -1;
+};
+
+const register = async (req, res) => {
   const { email, username, password, avter, role } = req.body;
 
   const savedEmail = email.toLowerCase().trim();
@@ -17,13 +31,9 @@ const register = (req, res) => {
   if (!re.test(String(savedEmail).toLowerCase().trim()))
     res.status(401).send("email address is not correct");
 
-  if (
-    password.length > 5 &&
-    /\d/.test(password) &&
-    /[a-z]/.test(password) &&
-    /[A-Z]/.test(password) &&
-    /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)
-  )
+  const passwordHashed = await setPassword(password);
+
+  if (passwordHashed !== -1)
     userModel
       .find({})
       .then(async (result) => {
@@ -39,8 +49,6 @@ const register = (req, res) => {
 
         if (found) res.status(400).send("the username or email are exist");
         else {
-          const passwordHashed = await bcrypt.hash(password, SALT);
-
           const newUser = new userModel({
             email: savedEmail,
             username: username,
@@ -89,11 +97,18 @@ const verify = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const user = await userModel.findOne({ email: req.body.email });
+
     if (!user)
       return res.status(400).send("user with given email doesn't exist");
 
-    const link = `${process.env.BASE_URL}/user/completeResetPassword/${user._id}`;
-    await sendEmail(user.email, "Password reset", link);
+    // const message = `http://localhost:3000/completeResetPassword/${user._id}`;
+    // await sendEmail(user.email, "Verify Email", message);
+    // console.log(user.email);
+
+    const message = `http://localhost:3000/user/completeResetPassword/${user._id}`;
+    console.log(message);
+    await sendEmail(user.email, "Verify Email", message);
+    //res.status(201).json(result);
 
     res.send("password reset link sent to your email account");
   } catch (error) {
@@ -105,12 +120,18 @@ const completeResetPassword = async (req, res) => {
   try {
     const user = await userModel.findById(req.params.id);
     if (!user) return res.status(400).send("invalid link or expired");
+    console.log(req.body.password);
 
-    user.password = req.body.password;
-    await user.save();
-    //await token.delete();
+    const passwordHashed = await setPassword(req.body.password);
+    console.log(passwordHashed);
 
-    res.send("password reset sucessfully.");
+    if (passwordHashed !== -1) {
+      user.password = passwordHashed;
+      await user.save();
+      res.send("password reset sucessfully.");
+    }
+
+    res.send("Password not complex");
   } catch (error) {
     res.send("An error occured");
     console.log(error);
@@ -122,7 +143,10 @@ const login = (req, res) => {
   //console.log(usernameOrEmail + " " + password);
 
   userModel
-    .find({ $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }] })
+    .find({
+      $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+      verified: true,
+    })
     .then(async (result) => {
       if (result) {
         if (
